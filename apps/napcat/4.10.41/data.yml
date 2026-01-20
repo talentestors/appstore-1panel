@@ -22,13 +22,6 @@ additionalProperties:
       labelZh: WebUI工作前缀
       required: false
       type: text
-    - default: napcat
-      edit: false
-      envKey: WEBUI_TOKEN
-      labelEn: WEBUI_TOKEN
-      labelZh: 登录密钥(默认napcat)
-      required: true
-      type: text
     - default: 3
       edit: false
       envKey: WEBUI_LOGIN_RATE
