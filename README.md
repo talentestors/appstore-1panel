@@ -6,8 +6,8 @@ A custom application store for [1Panel](https://github.com/1Panel-dev/1Panel) fe
 
 ## 📱 Featured Applications
 
-- **NapCat** - QQ Bot Framework for building chatbots
-- **OI-Bot** - AI-powered intelligent chatbot platform
+- [NapCat](https://github.com/NapNeko/NapCatQQ) - Modern protocol-side framework based on NTQQ
+- [OI-Bot](https://github.com/talentestors/OI-Bot/) - A chatbot based on the Nonebot2 framework to provide relevant information for OIers and ACMers.
 
 ## ✨ Features
 

@@ -6,8 +6,8 @@
 
 ## 📱 精选应用
 
-- **NapCat** - 用于构建聊天机器人的 QQ 框架
-- **OI-Bot** - 智能聊天机器人平台
+- [NapCat](https://github.com/NapNeko/NapCatQQ) - Modern protocol-side framework based on NTQQ
+- [OI-Bot](https://github.com/talentestors/OI-Bot/) - A chatbot based on the Nonebot2 framework to provide relevant information for OIers and ACMers.
 
 ## ✨ 功能
 
