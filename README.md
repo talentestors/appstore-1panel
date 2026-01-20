@@ -1,18 +1,61 @@
-# 1Panel App Store
+# Personal 1Panel App Store
 
-The official repository for the [1Panel](https://github.com/1Panel-dev/1Panel) App Store, containing all applications available for installation via the [1Panel](https://github.com/1Panel-dev/1Panel) App Store.
+**Language:** English | [简体中文](README_zh-CN.md)
 
-### 1Panel App Store Listing Criteria:
+A custom application store for [1Panel](https://github.com/1Panel-dev/1Panel) featuring auto-update capabilities for third-party applications.
 
- - Well-known and active open-source projects
- - Significant installation base
- - Official Docker images provided
- - Other approved projects
+## 📱 Featured Applications
 
-## Issue Reporting
+- **NapCat** - QQ Bot Framework for building chatbots
+- **OI-Bot** - AI-powered intelligent chatbot platform
 
-If you encounter any problems during use or have additional feedback, please submit a GitHub Issue to the [main 1Panel repository](https://github.com/1Panel-dev/1Panel/issues).
+## ✨ Features
 
-## Creating Local Applications
+- 🔄 **Automated Updates** - Version updates managed via Renovate
+- 📦 **Easy Installation** - Simplified installation script
+- 🤖 **CI/CD Integration** - GitHub Actions workflows for automation
 
-[How to submit an application you want](https://github.com/1Panel-dev/appstore/wiki/%E5%A6%82%E4%BD%95%E6%8F%90%E4%BA%A4%E8%87%AA%E5%B7%B1%E6%83%B3%E8%A6%81%E7%9A%84%E5%BA%94%E7%94%A8)
+## 🚀 Quick Start
+
+### One-Command Installation
+
+Run this single command to download and execute the installation script:
+
+```bash
+bash <(curl -sL "https://raw.githubusercontent.com/talentestors/appstore-1panel/refs/heads/main/install_app.sh")
+```
+
+<!-- 
+**Alternative mirrors (for mainland China users):**
+
+```bash
+# Using Gitee mirror (recommended for China)
+``` -->
+
+<!-- ### Installation
+
+What the script will do:
+
+1. Clone the repository from main branch
+2. Copy applications to 1Panel local app directory
+3. Install environment files
+4. Clean up temporary files
+
+### Manual Setup
+
+If you prefer to install manually:
+
+```bash
+# Clone the repository (choose your mirror)
+# Official GitHub
+git clone -b main https://github.com/talentestors/appstore-1panel.git
+
+# Or use Gitee mirror (faster in China)
+git clone -b main https://gitee.com/talentestors/appstore-1panel.git
+
+# Navigate to directory
+cd appstore-1panel
+
+# Run installation
+bash install_app.sh
+``` -->
