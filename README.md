@@ -25,14 +25,14 @@ Run this single command to download and execute the installation script:
 bash <(curl -sL "https://raw.githubusercontent.com/talentestors/appstore-1panel/refs/heads/main/install_app.sh")
 ```
 
-<!-- 
 **Alternative mirrors (for mainland China users):**
 
 ```bash
 # Using Gitee mirror (recommended for China)
-``` -->
+bash <(curl -sL "https://gitee.com/talentestors/appstore-1panel/raw/main/install_app.sh")
+```
 
-<!-- ### Installation
+### Installation
 
 What the script will do:
 
@@ -40,22 +40,3 @@ What the script will do:
 2. Copy applications to 1Panel local app directory
 3. Install environment files
 4. Clean up temporary files
-
-### Manual Setup
-
-If you prefer to install manually:
-
-```bash
-# Clone the repository (choose your mirror)
-# Official GitHub
-git clone -b main https://github.com/talentestors/appstore-1panel.git
-
-# Or use Gitee mirror (faster in China)
-git clone -b main https://gitee.com/talentestors/appstore-1panel.git
-
-# Navigate to directory
-cd appstore-1panel
-
-# Run installation
-bash install_app.sh
-``` -->
