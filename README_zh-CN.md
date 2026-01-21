@@ -25,14 +25,14 @@
 bash <(curl -sL "https://raw.githubusercontent.com/talentestors/appstore-1panel/refs/heads/main/install_app.sh")
 ```
 
-<!-- 
 **替代镜像（中国大陆用户使用）：**
 
 ```bash
 # 使用 Gitee 镜像（推荐中国大陆使用）
-``` -->
+bash <(curl -sL "https://gitee.com/talentestors/appstore-1panel/raw/main/install_app.sh")
+```
 
-<!-- ### 安装
+### 安装
 
 脚本的作用：
 
@@ -41,6 +41,7 @@ bash <(curl -sL "https://raw.githubusercontent.com/talentestors/appstore-1panel/
 3. 安装环境文件
 4. 清理临时文件
 
+<!-- 
 ### 手动设置
 
 如果你希望手动安装：
