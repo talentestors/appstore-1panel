@@ -20,7 +20,7 @@ do
 	# Assuming that the app version will be from the first docker service
 	first_service=$(yq '.services | keys | .[0]' $docker_compose_file)
 
-	image=$(yq .services.$first_service.image $docker_compose_file)
+	image=$(yq -r .services.$first_service.image $docker_compose_file)
 
     echo "First service: $first_service"
     echo "Image: $image"
@@ -30,8 +30,10 @@ do
 	  # Extract version from the last colon (handles registries with ports)
 	  version=$(echo "$image" | rev | cut -d ":" -f1 | rev)
 
-	  # Trim the "v" prefix
+	  # Remove quotes, "v" prefix, and any trailing characters
 	  trimmed_version=${version/#"v"}
+	  trimmed_version=${trimmed_version//\"/}
+	  trimmed_version=$(echo "$trimmed_version" | tr -d '"')
 
       echo "Extracted version: $version"
       echo "Trimmed version: $trimmed_version"
