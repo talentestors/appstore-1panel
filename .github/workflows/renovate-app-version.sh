@@ -27,7 +27,8 @@ do
 
 	# Only apply changes if the format is <image>:<version>
 	if [[ "$image" == *":"* ]]; then
-	  version=$(cut -d ":" -f2- <<< "$image")
+	  # Extract version from the last colon (handles registries with ports)
+	  version=$(echo "$image" | rev | cut -d ":" -f1 | rev)
 
 	  # Trim the "v" prefix
 	  trimmed_version=${version/#"v"}
@@ -36,7 +37,13 @@ do
       echo "Trimmed version: $trimmed_version"
       echo "Renaming directory from $old_version to $trimmed_version"
 
-      mv apps/$app_name/$old_version apps/$app_name/$trimmed_version
+      # Only rename if the trimmed version is different from the old version
+      if [ "$old_version" != "$trimmed_version" ] && [ ! -d "apps/$app_name/$trimmed_version" ]; then
+        mv apps/$app_name/$old_version apps/$app_name/$trimmed_version
+        echo "Directory renamed successfully"
+      else
+        echo "Directory rename skipped (version unchanged or already exists)"
+      fi
     else
       echo "Image format not recognized, skipping"
     fi
