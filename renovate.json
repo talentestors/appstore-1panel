@@ -1,11 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base"],
+  "extends": ["config:recommended", ":dependencyDashboard"],
   "gitIgnoredAuthors": [
     "githubaction@githubaction.com"
-  ],
-  "repositories": [
-    "talentestors/appstore-1panel"
   ],
   "rebaseWhen": "never",
   "packageRules": [
@@ -18,5 +15,9 @@
       "automerge": true
     }
   ],
+  "platformAutomerge": true,
+  "automerge": true,
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
   "prCreation": "immediate"
 }
