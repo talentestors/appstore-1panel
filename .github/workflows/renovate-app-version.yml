@@ -139,6 +139,18 @@ jobs:
                   commit_message: `Automated app version updates.\n\nBranch: ${branch}`
                 });
                 console.log(`Successfully merged PR #${pr.number}`);
+                
+                // Delete the branch after successful merge
+                try {
+                  await github.rest.git.deleteRef({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    ref: `heads/${branch}`
+                  });
+                  console.log(`Successfully deleted branch: ${branch}`);
+                } catch (deleteError) {
+                  console.log(`Failed to delete branch ${branch}: ${deleteError.message}`);
+                }
               } catch (error) {
                 console.log(`Cannot merge PR #${pr.number} yet: ${error.message}`);
                 console.log('PR will be available for manual review');
