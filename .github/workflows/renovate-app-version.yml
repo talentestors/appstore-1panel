@@ -34,25 +34,40 @@ jobs:
 
       - name: Run renovate-app-version.sh on updated files
         run: |
+          echo "Processing updated files..."
           IFS=' ' read -ra files <<< "${{ steps.updated-files.outputs.files }}"
+          echo "Found ${#files[@]} updated files"
 
           for file in "${files[@]}"; do
+            echo "Checking file: $file"
             if [[ $file == *"docker-compose.yml"* ]]; then
               app_name=$(echo $file | cut -d'/' -f 2)
               old_version=$(echo $file | cut -d'/' -f 3)
+              echo "Processing app: $app_name, old version: $old_version"
               chmod +x .github/workflows/renovate-app-version.sh
               .github/workflows/renovate-app-version.sh $app_name $old_version
+              echo "Finished processing $app_name"
+            else
+              echo "Skipping file: $file (not docker-compose.yml)"
             fi
           done
+          echo "File processing completed"
 
       - name: Commit & Push Changes
         run: |
+          echo "Starting commit and push process..."
           IFS=' ' read -ra files <<< "${{ steps.updated-files.outputs.files }}"
+          echo "Found ${#files[@]} files to check for commit"
 
           for file in "${files[@]}"; do
+            echo "Checking file: $file"
             if [[ $file == *"docker-compose.yml"* ]]; then
               app_name=$(echo $file | cut -d'/' -f 2)
-              git add "apps/$app_name/*" && git commit -m "Update app version [skip ci]" --no-verify && git push || true
+              echo "Committing changes for app: $app_name"
+              git add "apps/$app_name/*" && git commit -m "Update app version [skip ci]" --no-verify && git push || echo "Push failed or nothing to push for $app_name"
+            else
+              echo "Skipping commit for file: $file (not docker-compose.yml)"
             fi
           done
+          echo "Commit and push process completed"
 
