@@ -22,6 +22,11 @@ jobs:
           git config --local user.email "githubaction@githubaction.com"
           git config --local user.name "github-action update-app-version"
 
+      - name: Install yq
+        run: |
+          sudo apt update
+          sudo apt install -y yq
+
       - name: Get list of updated files by the last commit in this branch separated by space
         id: updated-files
         run: |
