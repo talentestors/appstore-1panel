@@ -1,13 +1,13 @@
 {
   "branchPrefix": "renovate/",
-  "dryRun": false,
+  "dryRun": "full",
   "username": "renovate-release",
   "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
   "onboarding": false,
   "platform": "github",
   "forkProcessing": "enabled",
   "repositories": [
-    "talentestors/appstore-1panel",
+    "talentestors/appstore-1panel"
   ],
   "packageRules": [
     {

@@ -4,6 +4,9 @@
   "gitIgnoredAuthors": [
     "githubaction@githubaction.com"
   ],
+  "repositories": [
+    "talentestors/appstore-1panel"
+  ],
   "rebaseWhen": "never",
   "packageRules": [
     {
