@@ -4,92 +4,143 @@ on:
   push:
     branches: [ 'renovate/*' ]
   workflow_dispatch:
-    inputs:
-      manual-trigger:
-        description: 'Manually trigger Renovate'
-        default: ''
+
 jobs:
   update-app-version:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
-          fetch-depth: 1
+          fetch-depth: 0  # Get full history for proper diff
 
-      - name: Configure repo
+      - name: Configure git
         run: |
-          git config --local user.email "githubaction@githubaction.com"
-          git config --local user.name "github-action update-app-version"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
 
-      - name: Install yq
+      - name: Install dependencies
         run: |
           sudo apt update
           sudo apt install -y yq
 
-      - name: Get list of updated files by the last commit in this branch separated by space
-        id: updated-files
+      - name: Detect changed files
+        id: changes
         run: |
-          echo "files=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "push" ]; then
+            # For push events, compare with the previous commit
+            files=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }})
+          else
+            # For workflow_dispatch, compare with main
+            files=$(git diff origin/main --name-only)
+          fi
+          
+          # Filter for docker-compose.yml files
+          docker_files=$(echo "$files" | grep "docker-compose.yml" | sort -u || true)
+          echo "docker_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$docker_files" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Run renovate-app-version.sh on updated files
+      - name: Process app versions
+        if: steps.changes.outputs.docker_files != ''
+        id: process
         run: |
-          echo "Processing updated files..."
-          IFS=' ' read -ra files <<< "${{ steps.updated-files.outputs.files }}"
-          echo "Found ${#files[@]} updated files"
-
-          for file in "${files[@]}"; do
-            echo "Checking file: $file"
-            if [[ $file == *"docker-compose.yml"* ]]; then
-              app_name=$(echo $file | cut -d'/' -f 2)
-              old_version=$(echo $file | cut -d'/' -f 3)
-              echo "Processing app: $app_name, old version: $old_version"
-              chmod +x .github/workflows/renovate-app-version.sh
-              .github/workflows/renovate-app-version.sh $app_name $old_version
-              echo "Finished processing $app_name"
-            else
-              echo "Skipping file: $file (not docker-compose.yml)"
+          chmod +x .github/workflows/renovate-app-version.sh
+          
+          echo "${{ steps.changes.outputs.docker_files }}" | while read docker_file; do
+            if [ -z "$docker_file" ]; then
+              continue
             fi
+            
+            app_name=$(echo "$docker_file" | cut -d'/' -f 2)
+            old_version=$(echo "$docker_file" | cut -d'/' -f 3)
+            
+            echo "Processing: $app_name ($old_version)"
+            .github/workflows/renovate-app-version.sh "$app_name" "$old_version"
           done
-          echo "File processing completed"
+          
+          # Check if there are changes to commit
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Commit & Push Changes
+      - name: Commit and push changes
+        if: steps.process.outputs.has_changes == 'true'
         run: |
-          echo "Starting commit and push process..."
-          IFS=' ' read -ra files <<< "${{ steps.updated-files.outputs.files }}"
-          echo "Found ${#files[@]} files to check for commit"
+          git add -A
+          git commit -m "chore: update app versions from Renovate [skip ci]" \
+                    --author="github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          git push
 
-          for file in "${files[@]}"; do
-            echo "Checking file: $file"
-            if [[ $file == *"docker-compose.yml"* ]]; then
-              app_name=$(echo $file | cut -d'/' -f 2)
-              echo "Committing changes for app: $app_name"
-              git add "apps/$app_name/*" && git commit -m "Update app version [skip ci]" --no-verify && git push || echo "Push failed or nothing to push for $app_name"
-            else
-              echo "Skipping commit for file: $file (not docker-compose.yml)"
-            fi
-          done
-          echo "Commit and push process completed"
-
-      - name: Create Pull Request or Merge
+      - name: Create or update pull request
+        if: steps.process.outputs.has_changes == 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const branch = context.ref.replace('refs/heads/', '');
-            const pr = await github.rest.pulls.list({
+            const title = `chore: update app versions from Renovate`;
+            const body = `Automated app version updates from Renovate.\n\nBranch: \`${branch}\``;
+            
+            // Check if PR already exists
+            const existingPRs = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
               head: `${context.repo.owner}:${branch}`,
               state: 'open'
             });
             
-            if (pr.data.length > 0) {
-              await github.rest.pulls.merge({
+            if (existingPRs.data.length > 0) {
+              console.log(`PR #${existingPRs.data[0].number} already exists, skipping creation`);
+            } else {
+              const newPR = await github.rest.pulls.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                pull_number: pr.data[0].number,
-                merge_method: 'squash'
+                title: title,
+                body: body,
+                head: branch,
+                base: 'main'
               });
-              console.log('PR merged successfully');
+              console.log(`Created PR #${newPR.data.number}`);
+            }
+
+      - name: Auto-merge pull request
+        if: steps.process.outputs.has_changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const branch = context.ref.replace('refs/heads/', '');
+            
+            // Wait a moment for PR to be created
+            await new Promise(r => setTimeout(r, 2000));
+            
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${branch}`,
+              state: 'open'
+            });
+            
+            if (prs.data.length > 0) {
+              const pr = prs.data[0];
+              try {
+                await github.rest.pulls.merge({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  merge_method: 'squash',
+                  commit_title: 'chore: update app versions from Renovate',
+                  commit_message: `Automated app version updates.\n\nBranch: ${branch}`
+                });
+                console.log(`Successfully merged PR #${pr.number}`);
+              } catch (error) {
+                console.log(`Cannot merge PR #${pr.number} yet: ${error.message}`);
+                console.log('PR will be available for manual review');
+              }
             }
