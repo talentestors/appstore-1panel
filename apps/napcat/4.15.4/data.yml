@@ -57,6 +57,13 @@ additionalProperties:
       labelZh: NapCat配置路径
       required: true
       type: text
+    - default: './data/chrome'
+      edit: true
+      envKey: CHORME
+      labelEn: Chorme
+      labelZh: Chorme 浏览器挂载路径
+      required: false
+      type: text
     - default: ./data/QQ
       edit: true
       envKey: QQ_PATH
