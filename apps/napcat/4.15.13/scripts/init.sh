@@ -3,7 +3,7 @@
 source ./.env
 
 mkdir -p "${CONFIG_PATH}"
-mkdir -p "${CHROME}"
+mkdir -p "${CHROME_PATH}"
 
 touch "${CONFIG_PATH}/webui.json"
 WEBUI_PATH="${CONFIG_PATH}/webui.json"
